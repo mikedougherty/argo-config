@@ -29,6 +29,7 @@ spec:
               - url: ssh://git@github.com/argoproj/argo-helm.git
           ingress:
             enabled: true
+            path: /argocd
   project: argocd
   syncPolicy:
     automated:
