@@ -1,0 +1,40 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  # Project description
+  description: Contains the definitions for ArgoCD itself
+
+  sourceRepos:
+  - 'ssh://git@github.com/mikedougherty/argo-config.git'
+  - 'ssh://git@github.com/argoproj/argo-helm.git'
+
+  # Only need to deploy to argocd namespace
+  destinations:
+  - namespace: 'argocd'
+    server: https://kubernetes.default.svc
+
+  # Deny all cluster-scoped resources from being created, except for Namespace and ClusterRole[Binding]
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  - group: 'rbac.authorization.k8s.io'
+    kind: ClusterRole
+  - group: 'rbac.authorization.k8s.io'
+    kind: ClusterRoleBinding
+
+  # Allow all namespaced-scoped resources to be created, except for ResourceQuota, LimitRange, NetworkPolicy
+  namespaceResourceBlacklist:
+  - group: ''
+    kind: ResourceQuota
+  - group: ''
+    kind: LimitRange
+  - group: ''
+    kind: NetworkPolicy
+
+  # Disable orphaned resource warnings.
+  orphanedResources:
+    warn: false

@@ -1,0 +1,36 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: charts/argo-cd
+    repoURL: 'ssh://git@github.com/argoproj/argo-helm.git'
+    targetRevision: master
+    helm:
+      values: |
+        image:
+          tag: "v1.4.1"
+        installCRDs: false
+        server:
+          config:
+            application.instanceLabelKey: argocd.argoproj.io/instance
+            repository.credentials: |
+              - url: ssh://git@github.com/
+                sshPrivateKeySecret:
+                  key: sshPrivateKey
+                  name: github-key
+            repositories: |
+              - url: ssh://git@github.com/mikedougherty/argo-config.git
+              - url: ssh://git@github.com/argoproj/argo-helm.git
+          ingress:
+            enabled: true
+  project: argocd
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true

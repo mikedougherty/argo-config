@@ -1,0 +1,19 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-config-bootstrap
+  namespace: argocd
+spec:
+  project: argocd
+  source:
+    path: bootstrap/
+    repoURL: 'ssh://git@github.com/mikedougherty/argo-config.git'
+    targetRevision: master
+  destination:
+    namespace: argocd
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
